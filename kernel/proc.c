@@ -707,7 +707,7 @@ void scheduler(void)
     int winning_tickets = 1;
     
     if (total_tickets)
-      winning_tickets = next() % total_tickets + 1; // winning ticket, randomly generated between 1 and total_tickets
+      winning_tickets = rand() % total_tickets + 1; // winning ticket, randomly generated between 1 and total_tickets
 
     for (p = proc; p < &proc[NPROC]; p++)
     {

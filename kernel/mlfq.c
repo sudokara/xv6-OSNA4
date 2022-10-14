@@ -8,7 +8,6 @@
 #include "defs.h"
 
 #include "mlfq.h"
-#define MLFQTEST 0
 
 struct _mlfq_queue mlfq_queue;
 

@@ -1,53 +1,38 @@
 #ifndef _RANDINT_H_
 #define _RANDINT_H_
 #include "types.h"
-/* Written in 2019 by David Blackman and Sebastiano Vigna (vigna@acm.org)
-To the extent possible under law, the author has dedicated all copyright
-and related and neighboring rights to this software to the public domain
-worldwide. This software is distributed without any warranty.
-See <http://creativecommons.org/publicdomain/zero/1.0/>. */
-
-/* This is xoshiro128++ 1.0, one of our 32-bit all-purpose, rock-solid
-generators. It has excellent speed, a state size (128 bits) that is
-large enough for mild parallelism, and it passes all tests we are aware
-of.
-For generating just single-precision (i.e., 32-bit) floating-point
-numbers, xoshiro128+ is even faster.
-The state must be seeded so that it is not everywhere zero. */
-
-static inline uint rotl(const uint x, int k)
+// from FreeBSD.
+int
+do_rand(unsigned long *ctx)
 {
-    return (x << k) | (x >> (32 - k));
+/*
+ * Compute x = (7^5 * x) mod (2^31 - 1)
+ * without overflowing 31 bits:
+ *      (2^31 - 1) = 127773 * (7^5) + 2836
+ * From "Random number generators: good ones are hard to find",
+ * Park and Miller, Communications of the ACM, vol. 31, no. 10,
+ * October 1988, p. 1195.
+ */
+    long hi, lo, x;
+
+    /* Transform to [1, 0x7ffffffe] range. */
+    x = (*ctx % 0x7ffffffe) + 1;
+    hi = x / 127773;
+    lo = x % 127773;
+    x = 16807 * lo - 2836 * hi;
+    if (x < 0)
+        x += 0x7fffffff;
+    /* Transform to [0, 0x7ffffffd] range. */
+    x--;
+    *ctx = x;
+    return (x);
 }
 
-static uint s[4] = {1, 1, 1, 1};
+unsigned long rand_next = 1;
 
-uint next(void)
+int
+rand(void)
 {
-    const uint result = rotl(s[0] + s[3], 7) + s[0];
-
-    const uint t = s[1] << 9;
-
-    s[2] ^= s[0];
-    s[3] ^= s[1];
-    s[1] ^= s[2];
-    s[0] ^= s[3];
-
-    s[2] ^= t;
-
-    s[3] = rotl(s[3], 11);
-
-    return result;
+    return (do_rand(&rand_next));
 }
-
-uint32 rand_range(uint32 min, uint32 max) {
-	if (min > max)
-		return 0;
-	else if (min == max)
-		return min;
-	else {
-		return (next() % (max - min) )+ min;
-	}
-}
-
 #endif
