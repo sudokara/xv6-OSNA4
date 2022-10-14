@@ -39,4 +39,8 @@ for i in range(5):
     plt.plot(lists[i][0], lists[i][1], label = "Process " + str(i))
 
 plt.legend()
+
+plt.xlabel("Ticks")
+plt.ylabel("Queue Number")
+
 plt.savefig("mlfq_plot.png") 
