@@ -97,3 +97,5 @@ Notable facts are -
 
 ![Loading mlfq analysis](mlfq_plot.png "MLFQ Analysis")
 
+Note - ageing time limit is 30 ticks.
+
